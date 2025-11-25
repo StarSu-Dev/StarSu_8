@@ -19,6 +19,47 @@ body {
   color: var(--text);
   display: flex;
   min-height: 100vh;
+  position: relative;
+}
+
+/* КНОПКА ГАМБУРГЕРА ДЛЯ МОБИЛЬНЫХ */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1001;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: none;
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #042027;
+  transition: 0.3s;
+}
+
+.mobile-menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* SIDEBAR */
@@ -34,6 +75,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition: transform 0.3s ease;
 }
 
 .brand {
@@ -127,6 +169,7 @@ body {
   padding: 6px;
   cursor: pointer;
   border-radius: 6px;
+  font-size: 14px;
 }
 .item:hover {
   background: rgba(255, 255, 255, 0.05);
@@ -138,4 +181,143 @@ body {
   padding: 24px;
   overflow-y: auto;
   background: var(--bg);
+  transition: margin-left 0.3s ease;
+}
+
+/* ОВЕРЛЕЙ ДЛЯ МОБИЛЬНОГО МЕНЮ */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(4px);
+}
+
+/* АДАПТИВ ДЛЯ МОБИЛЬНЫХ */
+@media (max-width: 768px) {
+  body {
+    flex-direction: row;
+    margin-right: 0;
+  }
+
+  /* Скрываем сайдбар по умолчанию на мобильных */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100vh;
+    z-index: 1000;
+    background: #0b1220;
+    border-right: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    transition: right 0.3s ease;
+  }
+
+  .sidebar.active {
+    right: 0;
+  }
+
+  .content {
+    margin-left: 0;
+    padding: 16px;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  /* Показываем кнопку гамбургера */
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  /* Показываем оверлей когда меню открыто */
+  .mobile-overlay.active {
+    display: block;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .brand h1 {
+    font-size: 14px;
+  }
+
+  .brand p {
+    font-size: 11px;
+  }
+
+  .menu {
+    max-height: calc(100vh - 200px);
+  }
+
+  .section {
+    margin-bottom: 6px;
+  }
+
+  .head {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .items {
+    padding: 4px 8px 8px;
+  }
+
+  .item {
+    padding: 5px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 280px;
+    right: -280px;
+  }
+
+  .sidebar.active {
+    right: 0;
+  }
+
+  .content {
+    padding: 12px;
+  }
+
+  .search input {
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  .menu {
+    max-height: calc(100vh - 180px);
+  }
+
+  .mobile-menu-toggle {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Для landscape ориентации на мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  .sidebar {
+    height: 100vh;
+  }
+
+  .menu {
+    max-height: calc(100vh - 150px);
+  }
 }
