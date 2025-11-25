@@ -71,7 +71,7 @@ function renderCards(items) {
   content.appendChild(grid);
 }
 
-// Функция для отображения содержимого папки как карточек
+// Функция для отображения содержимого папки как карточки
 function renderFolderContent(items, folderName) {
   content.innerHTML = `<h1>${folderName}</h1>`;
 
@@ -185,9 +185,85 @@ clearBtn.onclick = () => {
 
 searchInput.addEventListener("input", filterMenu);
 
+// Управление мобильным меню
+function initMobileMenu() {
+  const toggleBtn = document.createElement("button");
+  toggleBtn.className = "mobile-menu-toggle";
+  toggleBtn.innerHTML = `
+    <span></span>
+    <span></span>
+    <span></span>
+  `;
+
+  const overlay = document.createElement("div");
+  overlay.className = "mobile-overlay";
+
+  document.body.appendChild(toggleBtn);
+  document.body.appendChild(overlay);
+
+  const sidebar = document.querySelector(".sidebar");
+
+  function toggleMenu() {
+    toggleBtn.classList.toggle("active");
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("active");
+    document.body.style.overflow = sidebar.classList.contains("active")
+      ? "hidden"
+      : "";
+  }
+
+  toggleBtn.addEventListener("click", toggleMenu);
+  overlay.addEventListener("click", toggleMenu);
+
+  // Закрываем меню при клике на ссылку
+  document.querySelectorAll(".sidebar .item").forEach((item) => {
+    item.addEventListener("click", () => {
+      if (window.innerWidth <= 768) {
+        toggleMenu();
+      }
+    });
+  });
+}
+
+// Настройка Markdown рендерера для таблиц
+function setupMarkdownRenderer() {
+  const md = window.markdownit({
+    html: true,
+    linkify: true,
+    typographer: true,
+  });
+
+  // Кастомный рендеринг для таблиц
+  md.renderer.rules.table_open = function (tokens, idx, options, env, self) {
+    return '<div class="table-container"><table class="markdown-table">';
+  };
+
+  md.renderer.rules.table_close = function (tokens, idx, options, env, self) {
+    return "</table></div>";
+  };
+
+  // Улучшенный рендеринг ячеек
+  md.renderer.rules.th_open = function (tokens, idx, options, env, self) {
+    return '<th style="border: 1px solid #374151; padding: 12px; background: #1f2937;">';
+  };
+
+  md.renderer.rules.td_open = function (tokens, idx, options, env, self) {
+    return '<td style="border: 1px solid #374151; padding: 10px;">';
+  };
+
+  return md;
+}
+
 // Инициализация
 async function init() {
+  // Настраиваем markdown рендерер
+  window.md = setupMarkdownRenderer();
+
+  // Строим меню
   await buildMenu();
+
+  // Инициализируем мобильное меню
+  initMobileMenu();
 
   // Показываем приветственный экран
   content.innerHTML = `
@@ -199,4 +275,5 @@ async function init() {
   `;
 }
 
+// Запускаем инициализацию
 init();

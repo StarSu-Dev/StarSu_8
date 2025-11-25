@@ -1,5 +1,5 @@
 // Auto-generated structure for Starfinder
-// Generated: 2025-11-25T19:03:58.411Z
+// Generated: 2025-11-25T19:40:23.590Z
 
 const structure = {
   "Бестиарий": {
