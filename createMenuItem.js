@@ -5,7 +5,12 @@ function createMenuItem(itemName, itemValue, level = 0) {
     // Это файл — обычный пункт
     div.className = "item";
     div.textContent = itemName;
-    div.addEventListener("click", () => loadMarkdown(itemValue));
+    div.addEventListener("click", () => loadContent(itemValue));
+  } else if (itemValue.type === "card-list") {
+    // Это список карточек — отображаем карточки
+    div.className = "item";
+    div.textContent = itemName;
+    div.addEventListener("click", () => loadContent(itemValue));
   } else if (itemValue.type === "folder") {
     // Это раздел — сворачиваемый блок
     div.className = "section";

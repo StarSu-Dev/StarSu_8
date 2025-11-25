@@ -1,35 +1,59 @@
 // Подключаем markdown-it
 const md = window.markdownit({ html: true, linkify: true });
 
-// Новая структура меню — плоская, 1 уровень вложенности
+// Новая структура — с card-list для Классов, Рас и т.д.
 const structure = {
   Справочники: {
     type: "folder",
     items: {
-      Классы: "Классы/index.md",
-      Расы: "Расы/Расы CRB/index.md",
-      Навыки: "Навыки.md",
-      Черты: "Черты/index.md",
-      Темы: "Создание персонажей/Темы.md",
-      Снаряжение: "Снаряжение/index.md",
-      Звездолёты: "Звездолёты.md",
-      "Магия и заклинания": "Заклинания/index.md",
+      Классы: {
+        type: "card-list",
+        items: {
+          Механик: "sources/Классы/Механик.md",
+          Мистик: "sources/Классы/Мистик.md",
+          Техномант: "sources/Классы/Техномант.md",
+          Солдат: "sources/Классы/Солдат.md",
+          Оператор: "sources/Классы/Оператор.md",
+          Охотник: "sources/Классы/Охотник.md",
+          "Боец ближнего боя": "sources/Классы/Боец ближнего боя.md",
+        },
+      },
+      Расы: {
+        type: "card-list",
+        items: {
+          Андроид: "sources/Расы/Расы CRB/Андроид.md",
+          Человек: "sources/Расы/Расы CRB/Человек.md",
+          Касата: "sources/Расы/Расы CRB/Касата.md",
+        },
+      },
+      Навыки: "sources/Навыки.md",
+      Черты: "sources/Черты/index.md",
+      Темы: "sources/Создание персонажей/Темы.md",
+      Снаряжение: {
+        type: "card-list",
+        items: {
+          Броня: "sources/Снаряжение/Броня.md",
+          Оружие: "sources/Снаряжение/Оружие.md",
+        },
+      },
+      Звездолёты: "sources/Звездолёты.md",
+      "Магия и заклинания": "sources/Заклинания/index.md",
     },
   },
   "Тактические правила": {
     type: "folder",
     items: {
-      Бой: "Тактические правила/Бой.md",
-      Состояния: "Тактические правила/Состояния.md",
-      Передвижение: "Тактические правила/Передвижение.md",
+      Бой: "sources/Тактические правила/Бой.md",
+      Состояния: "sources/Тактические правила/Состояния.md",
+      Передвижение: "sources/Тактические правила/Передвижение.md",
     },
   },
   "Миры игры": {
     type: "folder",
     items: {
-      Планеты: "Миры игры/Планеты.md",
-      Фракции: "Миры игры/Фракции.md",
-      Локации: "Миры игры/Локации.md",
+      Планеты: "sources/Миры игры/Планеты.md",
+      Фракции: "sources/Миры игры/Фракции.md",
+      Локации: "sources/Миры игры/Локации.md",
     },
   },
 };
@@ -41,17 +65,48 @@ const content = document.getElementById("content");
 
 const openState = JSON.parse(localStorage.getItem("sidebarState") || "{}");
 
-// Загружаем Markdown → HTML
-async function loadMarkdown(path) {
-  try {
-    const res = await fetch(path);
-    if (!res.ok) throw new Error(`Failed to load: ${path}`);
-    const text = await res.text();
-    content.innerHTML = md.render(text);
-  } catch (err) {
-    console.error(err);
-    content.innerHTML = `<p>Ошибка загрузки: ${path}</p>`;
+// Функция, которая отвечает за отображение контента
+async function loadContent(itemValue) {
+  if (typeof itemValue === "string") {
+    try {
+      const res = await fetch(itemValue);
+      if (!res.ok) throw new Error(`Failed to load: ${itemValue}`);
+      const text = await res.text();
+      content.innerHTML = md.render(text);
+    } catch (err) {
+      console.error(err);
+      content.innerHTML = `<p>Ошибка загрузки: ${itemValue}</p>`;
+    }
+  } else if (itemValue.type === "card-list") {
+    renderCards(itemValue.items);
   }
+}
+
+// Функция для отображения карточек в сетке
+function renderCards(items) {
+  content.innerHTML = "";
+
+  const grid = document.createElement("div");
+  grid.className = "card-grid";
+
+  // Создаем карточки для всех классов
+  for (const name in items) {
+    const path = items[name];
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.textContent = name;
+
+    card.addEventListener("click", () => {
+      if (typeof path === "string") {
+        loadContent(path);
+      }
+    });
+
+    grid.appendChild(card);
+  }
+
+  content.appendChild(grid);
 }
 
 // Рекурсивное построение меню
@@ -62,7 +117,12 @@ function createMenuItem(itemName, itemValue, level = 0) {
     // Это файл — обычный пункт
     div.className = "item";
     div.textContent = itemName;
-    div.addEventListener("click", () => loadMarkdown(itemValue));
+    div.addEventListener("click", () => loadContent(itemValue));
+  } else if (itemValue.type === "card-list") {
+    // Это список карточек — отображаем карточки
+    div.className = "item";
+    div.textContent = itemName;
+    div.addEventListener("click", () => loadContent(itemValue));
   } else if (itemValue.type === "folder") {
     // Это раздел — сворачиваемый блок
     div.className = "section";

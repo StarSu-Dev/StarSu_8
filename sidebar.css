@@ -131,29 +131,11 @@ body {
 .item:hover {
   background: rgba(255, 255, 255, 0.05);
 }
-.card-grid {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  padding: 20px;
-}
 
-.card {
-  background: #151a2a;
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  transition: 0.2s;
-  border: 1px solid #20263b;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  border-color: #3a4cff;
-  box-shadow: 0 0 12px #3a4cff55;
-}
-
-.card h3 {
-  margin: 0;
-  color: #fff;
+/* MAIN CONTENT */
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background: var(--bg);
 }
