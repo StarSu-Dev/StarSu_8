@@ -15,7 +15,8 @@ class StarfinderBuilder {
     }
 
     const structure = this.scanDirectory(this.sourcesPath);
-    this.generateStructureFile(structure);
+    const organizedStructure = this.organizeStructure(structure);
+    this.generateStructureFile(organizedStructure);
 
     console.log("✅ Сборка завершена!");
   }
@@ -48,7 +49,7 @@ class StarfinderBuilder {
           } else if (file.endsWith(".md")) {
             // Это MD файл
             const name = this.formatName(path.basename(file, ".md"));
-            items[name] = relativePath;
+            items[name] = relativePath.replace(/\\/g, "\\\\");
           }
         } catch (error) {
           console.log(`⚠️ Пропускаем ${file}: ${error.message}`);
@@ -86,12 +87,7 @@ class StarfinderBuilder {
       }
     });
 
-    return {
-      Справочники: {
-        type: "folder",
-        items: topLevelItems,
-      },
-    };
+    return topLevelItems;
   }
 
   isMainCategory(name) {
@@ -146,9 +142,9 @@ if (typeof window !== 'undefined') {
         } else if (value && typeof value === "object") {
           if (value.type === "card-list") {
             cardListsCount++;
-            fileCount += Object.keys(value.items).length;
-          } else if (value.type === "folder") {
-            countItems(value.items);
+            if (value.items) {
+              countItems(value.items);
+            }
           }
         }
       });
@@ -160,12 +156,10 @@ if (typeof window !== 'undefined') {
     console.log(`   🎯 Разделов с карточками: ${cardListsCount}`);
 
     // Показываем основные разделы
-    if (structure.Справочники && structure.Справочники.items) {
-      const sections = Object.keys(structure.Справочники.items).filter(
-        (name) => structure.Справочники.items[name].type === "card-list"
-      );
-      console.log(`   📋 Основные разделы: ${sections.join(", ")}`);
-    }
+    const sections = Object.keys(structure).filter(
+      (name) => structure[name].type === "card-list"
+    );
+    console.log(`   📋 Основные разделы: ${sections.join(", ")}`);
   }
 
   createExampleStructure() {

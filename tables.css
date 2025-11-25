@@ -1,30 +1,69 @@
-/* Стили для таблиц */
+/* ===== TABLE CONTAINERS ===== */
+.table-container {
+  overflow-x: auto;
+  margin: 30px 0;
+  border-radius: 16px;
+  position: relative;
+}
+
+/* Webkit scrollbar styles */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: var(--bg-table);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--accent-secondary);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+/* Firefox scrollbar styles */
+@supports (scrollbar-width: thin) {
+  .table-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-secondary) var(--bg-table);
+  }
+}
+
+/* ===== BASE TABLE STYLES ===== */
 .markdown-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
-  background: #151a2a;
-  border-radius: 12px;
+  background: var(--bg-card);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-width: 600px;
 }
 
 .markdown-table th {
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  background: linear-gradient(135deg, var(--accent-secondary), #3b82f6);
   color: white;
-  padding: 16px 12px;
+  padding: 20px 16px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
-  border-bottom: 2px solid #2563eb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid #2563eb;
+  white-space: nowrap;
 }
 
 .markdown-table td {
-  padding: 14px 12px;
-  border-bottom: 1px solid #2d3748;
-  color: #e2e8f0;
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
   font-size: 14px;
-  transition: background 0.2s ease;
+  transition: background 0.3s ease;
+  white-space: nowrap;
 }
 
 .markdown-table tr:last-child td {
@@ -39,116 +78,17 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Стили для ячеек с числами */
-.markdown-table td:contains-number {
-  text-align: right;
-  font-family: "Courier New", monospace;
-  font-weight: 600;
-  color: #6ee7b7;
-}
-
-/* Стили для заголовков таблиц в контенте */
-.content h3 + table {
-  margin-top: 10px;
-}
-
-/* Компактные таблицы */
+/* ===== TABLE VARIANTS ===== */
 .markdown-table.compact th,
 .markdown-table.compact td {
-  padding: 10px 8px;
+  padding: 12px 10px;
   font-size: 13px;
 }
 
-/* Таблицы с зеброй */
 .markdown-table.zebra tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.05);
 }
 
-/* Стили для responsive таблиц */
-.table-container {
-  overflow-x: auto;
-  margin: 20px 0;
-  border-radius: 12px;
-  -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
-
-  /* Фиксируем скролл только для таблицы */
-  overscroll-behavior-x: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #60a5fa #1e293b;
-}
-
-/* Кастомный скроллбар для таблиц */
-.table-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.table-container::-webkit-scrollbar-track {
-  background: #1e293b;
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: #60a5fa;
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
-}
-
-/* Индикатор для широких таблиц */
-.table-container::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 20px;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, #0f1720);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.table-container.scrollable::after {
-  opacity: 1;
-}
-
-/* Стили для таблиц в тёмной теме */
-.content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  background: #151a2a;
-  border: 1px solid #2d3748;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.content th {
-  background: #1e293b;
-  color: #60a5fa;
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 2px solid #334155;
-}
-
-.content td {
-  padding: 12px;
-  border-bottom: 1px solid #2d3748;
-  color: #cbd5e1;
-}
-
-.content tr:last-child td {
-  border-bottom: none;
-}
-
-.content tr:hover {
-  background: rgba(96, 165, 250, 0.05);
-}
-
-/* Стили для специфичных типов таблиц */
 .table-stats th {
   background: linear-gradient(135deg, #6ee7b7, #10b981);
 }
@@ -165,95 +105,126 @@
   background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
-/* Стили для капсионов таблиц */
-.table-caption {
-  caption-side: top;
-  text-align: center;
-  font-weight: 600;
-  color: #60a5fa;
-  padding: 10px;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
-}
-
-/* АДАПТИВ ДЛЯ МОБИЛЬНЫХ ТАБЛИЦ */
+/* ===== MOBILE TABLE STYLES ===== */
 @media (max-width: 768px) {
-  .markdown-table,
-  .content table {
-    font-size: 12px;
-    min-width: max-content; /* Таблица не сжимается, можно скроллить */
+  .table-container {
+    margin: 20px -20px;
+    border-radius: 0;
+    scroll-padding: 0 20px;
+  }
+
+  .markdown-table {
+    min-width: 700px;
+    font-size: 13px;
+    border-radius: 0;
   }
 
   .markdown-table th,
-  .markdown-table td,
-  .content th,
-  .content td {
-    padding: 12px 10px;
-    white-space: nowrap; /* Текст не переносится */
+  .markdown-table td {
+    padding: 16px 12px;
+    white-space: nowrap;
   }
 
-  .table-container {
-    margin: 16px -16px;
-    border-radius: 0;
-    padding: 0 16px;
-    scroll-padding: 16px;
-  }
-
-  /* Упрощаем hover эффекты на тач-устройствах */
-  .markdown-table tr:hover td {
-    background: rgba(96, 165, 250, 0.05);
-  }
-
-  /* Добавляем отступ для кнопки меню */
-  .content {
-    padding-top: 70px;
+  /* Scroll indicator for mobile */
+  .table-container::after {
+    content: "← →";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-secondary);
+    font-size: 12px;
+    opacity: 0.7;
+    animation: bounce 2s infinite;
+    pointer-events: none;
   }
 }
 
 @media (max-width: 480px) {
-  .markdown-table,
-  .content table {
-    font-size: 11px;
+  .table-container {
+    margin: 20px -15px;
+  }
+
+  .markdown-table {
+    min-width: 650px;
+    font-size: 12px;
   }
 
   .markdown-table th,
-  .markdown-table td,
-  .content th,
-  .content td {
-    padding: 10px 8px;
+  .markdown-table td {
+    padding: 14px 10px;
   }
 
-  .table-container {
-    margin: 12px -12px;
-    padding: 0 12px;
-  }
-
-  .table-caption {
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  /* Для очень маленьких таблиц делаем компактнее */
   .markdown-table.compact th,
   .markdown-table.compact td {
-    padding: 8px 6px;
+    padding: 10px 8px;
     font-size: 11px;
   }
 }
 
-/* Поддержка touch-устройств */
+/* ===== ALTERNATIVE MOBILE TABLE LAYOUT ===== */
+@media (max-width: 768px) {
+  .table-mobile-layout {
+    min-width: auto !important;
+  }
+
+  .table-mobile-layout thead {
+    display: none;
+  }
+
+  .table-mobile-layout tbody,
+  .table-mobile-layout tr,
+  .table-mobile-layout td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-mobile-layout tr {
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    background: var(--bg-card);
+  }
+
+  .table-mobile-layout td {
+    border: none;
+    padding: 8px;
+    position: relative;
+    padding-left: 50%;
+    white-space: normal;
+    text-align: left;
+  }
+
+  .table-mobile-layout td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 12px;
+    width: 45%;
+    font-weight: 600;
+    color: var(--accent-secondary);
+    font-size: 12px;
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    transform: translateY(-50%) translateX(-5px);
+  }
+}
+
+/* ===== TOUCH DEVICE OPTIMIZATIONS ===== */
 @media (hover: none) {
   .markdown-table tr:hover td {
     background: inherit;
   }
 
-  .card:hover {
-    transform: none;
+  .table-container::after {
+    display: none;
   }
-}
-
-/* Фиксируем скролл таблиц на iOS */
-.table-container {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
 }
