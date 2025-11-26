@@ -105,6 +105,7 @@ body {
   background: var(--bg-primary);
   transition: margin-left 0.3s ease;
   min-height: 100vh;
+  margin-right: 250px;
 }
 
 .welcome-message {

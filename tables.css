@@ -1,230 +1,105 @@
-/* ===== TABLE CONTAINERS ===== */
+/* ===== SIMPLE TABLE STYLES ===== */
 .table-container {
   overflow-x: auto;
-  margin: 30px 0;
-  border-radius: 16px;
-  position: relative;
+  margin: 20px 0;
 }
 
-/* Webkit scrollbar styles */
-.table-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.table-container::-webkit-scrollbar-track {
-  background: var(--bg-table);
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: var(--accent-secondary);
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
-}
-
-/* Firefox scrollbar styles */
-@supports (scrollbar-width: thin) {
-  .table-container {
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-secondary) var(--bg-table);
-  }
-}
-
-/* ===== BASE TABLE STYLES ===== */
 .markdown-table {
   width: 100%;
   border-collapse: collapse;
   background: var(--bg-card);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  min-width: 600px;
+  font-size: 14px;
+  table-layout: auto;
 }
 
 .markdown-table th {
-  background: linear-gradient(135deg, var(--accent-secondary), #3b82f6);
-  color: white;
-  padding: 20px 16px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 12px 16px;
   text-align: left;
-  font-weight: 700;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 3px solid #2563eb;
-  white-space: nowrap;
+  font-weight: 600;
+  white-space: normal; /* Разрешаем перенос */
+  word-wrap: break-word;
+  line-height: 1.4;
 }
 
 .markdown-table td {
-  padding: 18px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-primary);
-  font-size: 14px;
-  transition: background 0.3s ease;
-  white-space: nowrap;
+  vertical-align: top;
+  white-space: normal; /* Разрешаем перенос в ячейках */
+  word-wrap: break-word;
 }
 
 .markdown-table tr:last-child td {
   border-bottom: none;
 }
 
+/* Выравнивание по содержимому */
+.markdown-table th,
+.markdown-table td {
+  width: auto; /* Автоматическая ширина по содержимому */
+}
+
+/* Подсветка строки */
 .markdown-table tr:hover td {
-  background: rgba(96, 165, 250, 0.1);
+  background: rgba(96, 165, 250, 0.08);
 }
 
-.markdown-table tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-/* ===== TABLE VARIANTS ===== */
+/* Компактный вариант */
 .markdown-table.compact th,
 .markdown-table.compact td {
-  padding: 12px 10px;
+  padding: 8px 12px;
   font-size: 13px;
 }
 
-.markdown-table.zebra tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.table-stats th {
-  background: linear-gradient(135deg, #6ee7b7, #10b981);
-}
-
-.table-spells th {
-  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
-}
-
-.table-equipment th {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-}
-
-.table-creatures th {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-/* ===== MOBILE TABLE STYLES ===== */
+/* Мобильная адаптация */
 @media (max-width: 768px) {
   .table-container {
-    margin: 20px -20px;
-    border-radius: 0;
-    scroll-padding: 0 20px;
+    margin: 16px -16px;
   }
 
   .markdown-table {
-    min-width: 700px;
     font-size: 13px;
-    border-radius: 0;
+    min-width: 500px;
   }
 
   .markdown-table th,
   .markdown-table td {
-    padding: 16px 12px;
-    white-space: nowrap;
-  }
-
-  /* Scroll indicator for mobile */
-  .table-container::after {
-    content: "← →";
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--accent-secondary);
-    font-size: 12px;
-    opacity: 0.7;
-    animation: bounce 2s infinite;
-    pointer-events: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .table-container {
-    margin: 20px -15px;
-  }
-
-  .markdown-table {
-    min-width: 650px;
-    font-size: 12px;
-  }
-
-  .markdown-table th,
-  .markdown-table td {
-    padding: 14px 10px;
+    padding: 10px 12px;
   }
 
   .markdown-table.compact th,
   .markdown-table.compact td {
-    padding: 10px 8px;
-    font-size: 11px;
+    padding: 6px 8px;
+  }
+
+  /* На мобильных уменьшаем минимальную ширину для лучшего переноса */
+  .markdown-table th,
+  .markdown-table td {
+    min-width: 80px; /* Минимальная ширина для читаемости */
   }
 }
 
-/* ===== ALTERNATIVE MOBILE TABLE LAYOUT ===== */
+/* Мобильная адаптация */
 @media (max-width: 768px) {
-  .table-mobile-layout {
-    min-width: auto !important;
+  .table-container {
+    margin: 16px -16px;
   }
 
-  .table-mobile-layout thead {
-    display: none;
+  .markdown-table {
+    font-size: 13px;
+    min-width: 500px;
   }
 
-  .table-mobile-layout tbody,
-  .table-mobile-layout tr,
-  .table-mobile-layout td {
-    display: block;
-    width: 100%;
+  .markdown-table th,
+  .markdown-table td {
+    padding: 10px 12px;
   }
 
-  .table-mobile-layout tr {
-    margin-bottom: 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px;
-    background: var(--bg-card);
-  }
-
-  .table-mobile-layout td {
-    border: none;
-    padding: 8px;
-    position: relative;
-    padding-left: 50%;
-    white-space: normal;
-    text-align: left;
-  }
-
-  .table-mobile-layout td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 12px;
-    width: 45%;
-    font-weight: 600;
-    color: var(--accent-secondary);
-    font-size: 12px;
-  }
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(-50%) translateX(0);
-  }
-  50% {
-    transform: translateY(-50%) translateX(-5px);
-  }
-}
-
-/* ===== TOUCH DEVICE OPTIMIZATIONS ===== */
-@media (hover: none) {
-  .markdown-table tr:hover td {
-    background: inherit;
-  }
-
-  .table-container::after {
-    display: none;
+  .markdown-table.compact th,
+  .markdown-table.compact td {
+    padding: 6px 8px;
   }
 }
