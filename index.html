@@ -1,36 +1,59 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
-    <meta charset="utf-8" />
-    <title>StarSu_8</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Starfinder</title>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
-    <link rel="stylesheet" href="sidebar.css" />
+    <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="cards.css" />
+    <link rel="stylesheet" href="sidebar.css" />
     <link rel="stylesheet" href="tables.css" />
   </head>
   <body>
-    <div class="sidebar">
+    <!-- Кнопка мобильного меню будет создана JavaScript -->
+
+    <!-- Оверлей для закрытия меню будет создан JavaScript -->
+
+    <!-- Сайдбар -->
+    <aside class="sidebar" id="sidebar">
       <div class="brand">
         <div class="logo">SF</div>
-        <div>
+        <div class="brand-text">
           <h1>Starfinder</h1>
           <p>Справочник</p>
         </div>
       </div>
 
       <div class="search">
-        <input id="searchInput" type="text" placeholder="Поиск..." />
-        <button id="clearSearch">✕</button>
+        <input type="text" id="searchInput" placeholder="Поиск..." />
+        <button id="clearSearch" type="button">✕</button>
       </div>
 
-      <div id="menu" class="menu"></div>
-    </div>
+      <nav class="menu" id="menu">
+        <!-- Меню будет заполнено JavaScript -->
+        <div
+          style="
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+          "
+        >
+          Загрузка меню...
+        </div>
+      </nav>
+    </aside>
 
-    <main id="content" class="content">
-      <h1>Добро пожаловать в Starfinder</h1>
-      <p>Выберите раздел в меню слева.</p>
+    <!-- Основной контент -->
+    <main class="content" id="content">
+      <div class="welcome-message">
+        <h1>Добро пожаловать в Starfinder</h1>
+        <p>Выберите раздел в меню для просмотра контента.</p>
+        <p>Карточки будут отображаться в этой области.</p>
+      </div>
     </main>
 
+    <script src="structure.js"></script>
     <script src="sidebar.js"></script>
   </body>
 </html>
