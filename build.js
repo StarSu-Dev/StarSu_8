@@ -37,7 +37,6 @@ class StarfinderBuilder {
           const stat = fs.statSync(fullPath);
 
           if (stat.isDirectory()) {
-            // Это папка - сканируем и создаем card-list
             const subItems = this.scanDirectory(fullPath, relativePath);
             if (Object.keys(subItems).length > 0) {
               const folderName = this.formatName(file);
@@ -47,9 +46,8 @@ class StarfinderBuilder {
               };
             }
           } else if (file.endsWith(".md")) {
-            // Это MD файл
             const name = this.formatName(path.basename(file, ".md"));
-            items[name] = relativePath.replace(/\\/g, "\\\\");
+            items[name] = relativePath.replace(/\\/g, "/");
           }
         } catch (error) {
           console.log(`⚠️ Пропускаем ${file}: ${error.message}`);
@@ -73,7 +71,6 @@ class StarfinderBuilder {
   }
 
   organizeStructure(items) {
-    // Собираем все card-list для верхнего уровня
     const topLevelItems = {};
 
     Object.entries(items).forEach(([name, value]) => {
@@ -153,9 +150,8 @@ if (typeof window !== 'undefined') {
     countItems(structure);
     console.log("📊 Статистика:");
     console.log(`   📄 Файлов: ${fileCount}`);
-    console.log(`   🎯 Разделов с карточками: ${cardListsCount}`);
+    console.log(`   🎯 Разделов: ${cardListsCount}`);
 
-    // Показываем основные разделы
     const sections = Object.keys(structure).filter(
       (name) => structure[name].type === "card-list"
     );
@@ -166,29 +162,22 @@ if (typeof window !== 'undefined') {
     console.log("📝 Создаем примерную структуру...");
 
     const exampleFiles = {
-      // Бестиарий - card-list с существами
       "Бестиарий/Вампир.md": "# Вампир\n\nОпасное ночное существо...",
       "Бестиарий/Дракон.md": "# Дракон\n\nМогучее крылатое существо...",
-      "Бестиарий/Гоблин.md": "# Гоблин\n\nМелкое хитрое существо...",
-
-      // Классы - card-list с классами
       "Классы/Механик.md": "# Механик\n\nСпециалист по технологиям...",
       "Классы/Солдат.md": "# Солдат\n\nБоевой специалист...",
-
-      // Расы - card-list с расами
       "Расы/Андроид.md": "# Андроид\n\nИскусственная раса...",
-      "Расы/Человек.md": "# Человек\n\nУниверсальная раса...",
-
-      // Одиночные файлы
       "Навыки.md": "# Навыки\n\nСистема навыков персонажа...",
-      "Черты.md": "# Черты\n\nЧерты и особенности...",
     };
 
     Object.entries(exampleFiles).forEach(([filePath, content]) => {
       const fullPath = path.join(this.sourcesPath, filePath);
       const dir = path.dirname(fullPath);
 
-      fs.mkdirSync(dir, { recursive: true });
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
       fs.writeFileSync(fullPath, content, "utf8");
       console.log(`   📄 Создан: ${filePath}`);
     });

@@ -1,3 +1,4 @@
+// sidebar.js
 const contentCache = new Map();
 let currentMd = null;
 let openState = {};
@@ -12,22 +13,16 @@ async function loadDynamicStructure() {
     const response = await fetch("structure.js");
     if (response.ok) {
       const jsContent = await response.text();
-
-      // Безопасное выполнение кода структуры
       const module = {};
       new Function(
         "module",
         jsContent.replace("const structure =", "module.exports =")
       )(module);
       window.structure = module.exports;
-
       return window.structure;
     }
   } catch (error) {
-    console.warn(
-      "Динамическая структура не найдена, используем статическую:",
-      error
-    );
+    console.warn("Динамическая структура не найдена:", error);
   }
 
   return window.structure || {};
@@ -35,10 +30,7 @@ async function loadDynamicStructure() {
 
 // Настройка Markdown рендерера
 function setupMarkdownRenderer() {
-  if (!window.markdownit) {
-    console.error("MarkdownIt not loaded!");
-    return null;
-  }
+  if (!window.markdownit) return null;
 
   const md = window.markdownit({
     html: true,
@@ -46,69 +38,22 @@ function setupMarkdownRenderer() {
     typographer: true,
   });
 
-  // Кастомный рендеринг для таблиц
-  md.renderer.rules.table_open = function (tokens, idx, options, env, self) {
+  md.renderer.rules.table_open = function () {
     return '<div class="table-container"><table class="markdown-table">';
   };
 
-  md.renderer.rules.table_close = function (tokens, idx, options, env, self) {
+  md.renderer.rules.table_close = function () {
     return "</table></div>";
   };
 
   return md;
 }
 
-// Инжект стилей для загрузки
-function injectLoadingStyles() {
-  if (!document.getElementById("loading-styles")) {
-    const style = document.createElement("style");
-    style.id = "loading-styles";
-    style.textContent = `
-      .loading-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 200px;
-      }
-      .loading-text {
-        margin-left: 10px;
-        color: var(--text-secondary);
-      }
-      .error-message {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        margin: 20px 0;
-      }
-      .error-message button {
-        background: var(--accent-secondary);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 10px;
-        transition: background 0.3s ease;
-      }
-      .error-message button:hover {
-        background: #3b82f6;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-}
-
-// Загрузка контента с кэшированием
-async function loadContent(itemValue) {
+// Загрузка контента с поддержкой якорей
+async function loadContent(itemValue, anchor = null) {
   const content = document.getElementById("content");
   if (!content) return;
 
-  // Инжектим стили если нужно
-  injectLoadingStyles();
-
-  // Показываем индикатор загрузки
   content.innerHTML = `
     <div class="loading-container">
       <div class="loading-spinner"></div>
@@ -120,38 +65,36 @@ async function loadContent(itemValue) {
     let htmlContent = "";
 
     if (typeof itemValue === "string") {
-      // Проверяем кэш
       if (contentCache.has(itemValue)) {
         htmlContent = contentCache.get(itemValue);
       } else {
         const res = await fetch(itemValue);
         if (!res.ok) throw new Error(`Не удалось загрузить: ${itemValue}`);
         const text = await res.text();
-
-        if (!currentMd) {
-          throw new Error("Markdown рендерер не инициализирован");
-        }
-
         htmlContent = currentMd.render(text);
         contentCache.set(itemValue, htmlContent);
       }
     } else if (itemValue.type === "card-list") {
       renderCards(itemValue.items);
       return;
-    } else if (itemValue.type === "folder") {
-      renderFolderContent(itemValue.items, itemValue.name);
-      return;
     }
 
     content.innerHTML = htmlContent;
 
-    // Добавляем индикатор скролла для таблиц на мобильных
-    if (window.innerWidth <= 768) {
-      addTableScrollIndicators();
+    // Прокрутка к якорю после загрузки
+    if (anchor) {
+      setTimeout(() => {
+        const element =
+          document.getElementById(anchor) ||
+          document.querySelector(`[name="${anchor}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
     }
   } catch (err) {
     console.error("Ошибка загрузки контента:", err);
-    showError(`Ошибка загрузки: ${err.message}`);
+    content.innerHTML = `<div class="error-message">Ошибка загрузки: ${err.message}</div>`;
   }
 }
 
@@ -173,6 +116,10 @@ function renderCards(items) {
     card.textContent = name;
 
     card.addEventListener("click", () => {
+      const routePath = `/${name.toLowerCase().replace(/ /g, "-")}`;
+      if (window.navigateTo) {
+        window.navigateTo(routePath);
+      }
       loadContent(path);
     });
 
@@ -182,34 +129,7 @@ function renderCards(items) {
   content.appendChild(grid);
 }
 
-// Функция для отображения содержимого папки
-function renderFolderContent(items, folderName) {
-  const content = document.getElementById("content");
-  if (!content) return;
-
-  content.innerHTML = `<h1>${folderName}</h1>`;
-
-  const grid = document.createElement("div");
-  grid.className = "card-grid";
-
-  for (const name in items) {
-    const itemValue = items[name];
-
-    const card = document.createElement("div");
-    card.className = "card";
-    card.textContent = name;
-
-    card.addEventListener("click", () => {
-      loadContent(itemValue);
-    });
-
-    grid.appendChild(card);
-  }
-
-  content.appendChild(grid);
-}
-
-// Создание пунктов меню
+// Создание пунктов меню с навигацией
 function createMenuItem(itemName, itemValue, level = 0) {
   const div = document.createElement("div");
 
@@ -218,12 +138,15 @@ function createMenuItem(itemName, itemValue, level = 0) {
     div.textContent = itemName;
     div.addEventListener("click", (e) => {
       e.stopPropagation();
-      // Убираем активный класс у всех элементов
       document.querySelectorAll(".item").forEach((item) => {
         item.classList.remove("active");
       });
-      // Добавляем активный класс текущему элементу
       div.classList.add("active");
+
+      const path = `/${itemName.toLowerCase().replace(/ /g, "-")}`;
+      if (window.navigateTo) {
+        window.navigateTo(path);
+      }
       loadContent(itemValue);
     });
   } else if (itemValue.type === "card-list") {
@@ -235,6 +158,11 @@ function createMenuItem(itemName, itemValue, level = 0) {
         item.classList.remove("active");
       });
       div.classList.add("active");
+
+      const path = `/${itemName.toLowerCase().replace(/ /g, "-")}`;
+      if (window.navigateTo) {
+        window.navigateTo(path);
+      }
       renderCards(itemValue.items);
     });
   } else if (itemValue.type === "folder") {
@@ -277,13 +205,10 @@ async function buildMenu() {
   const menu = document.getElementById("menu");
   if (!menu) return;
 
-  // Показываем индикатор загрузки
   menu.innerHTML = '<div class="menu-loading">Загрузка структуры...</div>';
 
   try {
     const currentStructure = await loadDynamicStructure();
-
-    // Очищаем меню
     menu.innerHTML = "";
 
     if (Object.keys(currentStructure).length === 0) {
@@ -309,12 +234,8 @@ function filterMenu() {
   const query = searchInput.value.toLowerCase().trim();
 
   if (query === "") {
-    // Показываем все элементы при пустом поиске
     document.querySelectorAll(".section, .item").forEach((el) => {
       el.style.display = "";
-      if (el.classList.contains("section")) {
-        el.classList.remove("collapsed");
-      }
     });
     return;
   }
@@ -333,9 +254,7 @@ function filterMenu() {
       });
 
       el.style.display = hasMatch ? "" : "none";
-      if (hasMatch) {
-        el.classList.remove("collapsed");
-      }
+      if (hasMatch) el.classList.remove("collapsed");
     } else {
       const isVisible = el.textContent.toLowerCase().includes(query);
       el.style.display = isVisible ? "" : "none";
@@ -348,11 +267,7 @@ function initMobileMenu() {
   const toggleBtn = document.createElement("button");
   toggleBtn.className = "mobile-menu-toggle";
   toggleBtn.setAttribute("aria-label", "Открыть меню");
-  toggleBtn.innerHTML = `
-    <span></span>
-    <span></span>
-    <span></span>
-  `;
+  toggleBtn.innerHTML = `<span></span><span></span><span></span>`;
 
   const overlay = document.createElement("div");
   overlay.className = "mobile-overlay";
@@ -367,8 +282,6 @@ function initMobileMenu() {
     sidebar.classList.toggle("active", isActive);
     overlay.classList.toggle("active", isActive);
     document.body.style.overflow = isActive ? "hidden" : "";
-
-    // Обновляем ARIA атрибуты
     toggleBtn.setAttribute("aria-expanded", isActive);
     toggleBtn.setAttribute(
       "aria-label",
@@ -388,7 +301,6 @@ function initMobileMenu() {
   toggleBtn.addEventListener("click", toggleMenu);
   overlay.addEventListener("click", closeMenu);
 
-  // Закрываем меню при клике на ссылку или нажатии Escape
   document.addEventListener("click", (e) => {
     if (
       window.innerWidth <= 768 &&
@@ -405,37 +317,11 @@ function initMobileMenu() {
     }
   });
 
-  // Закрываем меню при изменении размера окна на десктоп
   window.addEventListener("resize", () => {
     if (window.innerWidth > 768 && sidebar.classList.contains("active")) {
       closeMenu();
     }
   });
-}
-
-// Добавление индикаторов скролла для таблиц
-function addTableScrollIndicators() {
-  document.querySelectorAll(".table-container").forEach((container) => {
-    if (container.scrollWidth > container.clientWidth) {
-      container.classList.add("scrollable");
-    }
-  });
-}
-
-// Показать ошибку
-function showError(message) {
-  const content = document.getElementById("content");
-  if (!content) return;
-
-  injectLoadingStyles();
-
-  content.innerHTML = `
-    <div class="error-message">
-      <h3>Ошибка загрузки</h3>
-      <p>${message}</p>
-      <button onclick="location.reload()">Перезагрузить страницу</button>
-    </div>
-  `;
 }
 
 // Очистка поиска
@@ -469,89 +355,33 @@ function setupSearch() {
     }
   });
 
-  // Инициализируем состояние кнопки очистки
   updateClearButton();
 }
 
 // Инициализация приложения
 async function init() {
-  console.log("Инициализация приложения Starfinder...");
-
   try {
-    // Сначала настраиваем markdown рендерер
     currentMd = setupMarkdownRenderer();
+    if (!currentMd) throw new Error("Markdown парсер не загружен");
 
-    if (!currentMd) {
-      throw new Error(
-        "Markdown парсер не загружен. Проверьте подключение к интернету."
-      );
-    }
-
-    // Инициализация состояния меню
     openState = JSON.parse(localStorage.getItem("sidebarState") || "{}");
-
-    // Настройка поиска
     setupSearch();
-
-    // Строим меню
     await buildMenu();
-
-    // Инициализируем мобильное меню
     initMobileMenu();
-
-    // Показываем приветственный экран
-    const content = document.getElementById("content");
-    if (content && content.innerHTML.includes("welcome-message")) {
-      // Контент уже отображает приветствие, ничего не делаем
-    }
-
-    // Обработчик изменения размера окна
-    window.addEventListener("resize", addTableScrollIndicators);
 
     console.log("Приложение Starfinder успешно инициализировано!");
   } catch (error) {
     console.error("Ошибка инициализации:", error);
-    showError(`Ошибка инициализации: ${error.message}`);
+    const content = document.getElementById("content");
+    if (content) {
+      content.innerHTML = `<div class="error-message">Ошибка инициализации: ${error.message}</div>`;
+    }
   }
 }
 
-// Стили для меню
-function injectMenuStyles() {
-  if (!document.getElementById("menu-styles")) {
-    const style = document.createElement("style");
-    style.id = "menu-styles";
-    style.textContent = `
-      .menu-loading, .menu-error {
-        text-align: center;
-        padding: 20px;
-        color: var(--text-secondary);
-        font-style: italic;
-      }
-      .menu-error {
-        color: #ef4444;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-}
-
-// Запускаем инициализацию когда DOM загружен
+// Запуск
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    injectMenuStyles();
-    init();
-  });
+  document.addEventListener("DOMContentLoaded", init);
 } else {
-  injectMenuStyles();
   init();
-}
-
-// Экспорт для тестирования
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = {
-    loadContent,
-    renderCards,
-    filterMenu,
-    setupMarkdownRenderer,
-  };
 }
