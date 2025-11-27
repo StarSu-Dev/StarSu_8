@@ -50,18 +50,24 @@
   padding: 20px 16px;
   text-align: left;
 <<<<<<< HEAD
+<<<<<<< HEAD
   font-weight: 600;
 
   white-space: normal; /* Разрешаем перенос */
   word-wrap: break-word;
   line-height: 1.4;
 =======
+=======
+>>>>>>> parent of de67d71 (working)
   font-weight: 700;
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 3px solid #2563eb;
   white-space: nowrap;
+<<<<<<< HEAD
+>>>>>>> parent of de67d71 (working)
+=======
 >>>>>>> parent of de67d71 (working)
 }
 
