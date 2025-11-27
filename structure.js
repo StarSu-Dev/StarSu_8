@@ -1,5 +1,9 @@
 // Auto-generated structure for Starfinder
+<<<<<<< HEAD
 // Generated: 2025-11-26T08:43:13.281Z
+=======
+// Generated: 2025-11-26T07:23:41.593Z
+>>>>>>> parent of 88e3f40 (Небольшие изменения по стилю)
 
 const structure = {
   "Бестиарий": {
